@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scorecard - E-Assessment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: black;
+            color: white;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .header-container {
+            position: relative;
+            background: #1f2937;
+            color: white;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-btn {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #3182ce;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-btn:hover {
+            background: #2c5282;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            max-height: 70vh;
+            background: rgba(20, 24, 32, 0.7);
+            padding: 25px;
+            border-radius: 12px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: gray black;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .scorecard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 10px;
+            background: rgba(20, 24, 32, 0.5);
+            backdrop-filter: blur(5px);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px;
+            text-align: left;
+            color: white;
+            transition: background 0.2s ease;
+        }
+
+        th {
+            background: rgba(59, 130, 246, 0.3);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background: #007BFF;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        footer {
+            background: #1f2937;
+            color: white;
+            padding: 15px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pass {
+            background-color: rgba(16, 185, 129, 0.3) !important;
+            color: #10ffaa !important;
+            font-weight: bold;
+            animation: pulse-success 2s infinite;
+        }
+        
+        .fail {
+            background-color: rgba(239, 68, 68, 0.3) !important;
+            color: #ff8080 !important;
+            font-weight: bold;
+            animation: pulse-fail 2s infinite;
+        }
+
+        @keyframes pulse-success {
+            0% { background-color: rgba(16, 185, 129, 0.2); }
+            50% { background-color: rgba(16, 185, 129, 0.4); }
+            100% { background-color: rgba(16, 185, 129, 0.2); }
+        }
+
+        @keyframes pulse-fail {
+            0% { background-color: rgba(239, 68, 68, 0.2); }
+            50% { background-color: rgba(239, 68, 68, 0.4); }
+            100% { background-color: rgba(239, 68, 68, 0.2); }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 5px solid #3498db;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 15px;
+            }
+            
+            th, td {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+            
+            .header-container {
+                font-size: 1rem;
+                padding: 12px;
+            }
+            
+            .back-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header-container">
+        Scorecard - OCR and NLP-Driven E-Assessment: Automated Grading of Handwritten Exam Papers
+        <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> Go Back</a>
+    </header>
+
+    <video autoplay loop muted>
+        <source src="{{ url_for('static', filename='video1.mp4') }}" type="video/mp4">
+    </video>
+
+    <!-- Scorecard Content -->
+    <div class="content-wrapper">
+        <div class="container">
+            <div class="scorecard-header">
+                <h2 class="text-2xl font-bold">Student Assessment Scorecard</h2>
+                <a href="/result" class="btn">
+                    <i class="fas fa-file-alt mr-2"></i> View Full Results
+                </a>
+            </div>
+
+            <div id="scorecardContent">
+                <table id="scorecardTable">
+                    <thead>
+                        <tr>
+                            <th>Question No.</th>
+                            <th>Question</th>
+                            <th>Student Answer</th>
+                            <th>Marks Obtained</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be inserted here -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3"><strong>Total Marks obtained out of {{ total_marks }}</strong></td>
+                            <td id="totalMarksObtained"><strong>0</strong></td>
+                        </tr>
+                        <tr id="statusRow">
+                            <td colspan="3"><strong>Result Status</strong></td>
+                            <td id="passFail"><strong>-</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 E-Assessment. All Rights Reserved. | OCR and NLP-Driven Assessment System</p>
+    </footer>
+
+    <!-- JavaScript to Fetch & Display Scorecard -->
+    <script>
+        // Show loading overlay
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+        
+        // Hide loading overlay
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+        
+        // Initialize table with animations
+        function initializeTable() {
+            const table = document.getElementById('scorecardTable');
+            table.style.opacity = '0';
+            table.style.transform = 'translateY(20px)';
+            table.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            
+            setTimeout(() => {
+                table.style.opacity = '1';
+                table.style.transform = 'translateY(0)';
+            }, 100);
+        }
+        
+        // Format marks with animation
+        function animateCountUp(element, finalValue) {
+            let startValue = 0;
+            let duration = 1000;
+            let startTime = null;
+            
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const currentValue = progress * finalValue;
+                element.innerText = currentValue.toFixed(2);
+                
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    element.innerText = finalValue.toFixed(2);
+                }
+            }
+            
+            window.requestAnimationFrame(step);
+        }
+
+        async function fetchScorecard() {
+            showLoading();
+            
+            try {
+                let response = await fetch("/get_scorecard");
+                let data = await response.json();
+                
+                hideLoading();
+
+                if (data.error) {
+                    console.error("Error fetching scorecard:", data.error);
+                    document.getElementById("scorecardTable").innerHTML = "<tr><td colspan='4'>Error loading scorecard.</td></tr>";
+                    return;
+                }
+
+                initializeTable();
+                
+                let tableBody = document.querySelector("#scorecardTable tbody");
+                tableBody.innerHTML = "";
+
+                let totalObtained = 0;
+                let status = "FAIL";
+                
+                // Process all rows except the last two (which contain totals and status)
+                for (let i = 0; i < data.scorecard.length - 2; i++) {
+                    let cols = data.scorecard[i];
+                    let tr = document.createElement("tr");
+                    
+                    // Add class to the row for animation
+                    tr.style.opacity = '0';
+                    tr.style.transform = 'translateY(10px)';
+                    tr.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    tr.style.transitionDelay = `${i * 0.1}s`;
+                    
+                    // Create and append cells
+                    cols.forEach((col, index) => {
+                        let td = document.createElement("td");
+                        td.textContent = col;
+                        
+                        // Style question column differently
+                        if (index === 1) {
+                            td.style.maxWidth = '300px';
+                            td.style.overflow = 'hidden';
+                            td.style.textOverflow = 'ellipsis';
+                        }
+                        
+                        // Style marks column
+                        if (index === 3) {
+                            td.style.fontWeight = 'bold';
+                            td.style.textAlign = 'center';
+                        }
+                        
+                        tr.appendChild(td);
+                    });
+
+                    tableBody.appendChild(tr);
+                    
+                    // Trigger animation after a short delay
+                    setTimeout(() => {
+                        tr.style.opacity = '1';
+                        tr.style.transform = 'translateY(0)';
+                    }, 50);
+                }
+                
+                // Handle the total row
+                if (data.scorecard.length >= 2) {
+                    let totalRow = data.scorecard[data.scorecard.length - 2];
+                    totalObtained = parseFloat(totalRow[3]);
+                    let totalElement = document.getElementById("totalMarksObtained");
+                    
+                    // Animate the total marks
+                    animateCountUp(totalElement, totalObtained);
+                }
+                
+                // Handle the status row
+                if (data.scorecard.length >= 1) {
+                    let statusRow = data.scorecard[data.scorecard.length - 1];
+                    status = statusRow[3];
+                    let passFail = document.getElementById("passFail");
+                    
+                    // Set status with delay for dramatic effect
+                    setTimeout(() => {
+                        passFail.innerText = status;
+                        
+                        // Apply styling based on pass/fail
+                        let statusRowElement = document.getElementById("statusRow");
+                        if (status === "PASS") {
+                            statusRowElement.className = "pass";
+                            passFail.innerHTML = '<i class="fas fa-check-circle mr-2"></i> ' + status;
+                        } else {
+                            statusRowElement.className = "fail";
+                            passFail.innerHTML = '<i class="fas fa-times-circle mr-2"></i> ' + status;
+                        }
+                    }, 1000);
+                }
+                
+            } catch (error) {
+                hideLoading();
+                console.error("Error:", error);
+                document.getElementById("scorecardTable").innerHTML = "<tr><td colspan='4'>Error loading scorecard.</td></tr>";
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchScorecard();
+        });
+    </script>
+
+</body>
+</html>

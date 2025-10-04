@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grading Results - E-Assessment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: black;
+            color: white;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .header-container {
+            position: relative;
+            background: #1f2937;
+            color: white;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-btn {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #3182ce;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-btn:hover {
+            background: #2c5282;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            max-height: 70vh;
+            background: rgba(20, 24, 32, 0.7);
+            padding: 25px;
+            border-radius: 12px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: gray black;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .result-content {
+            text-align: left;
+            font-size: 18px;
+            line-height: 1.6;
+            color: white;
+            white-space: pre-wrap;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background: #007BFF;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        footer {
+            background: #1f2937;
+            color: white;
+            padding: 15px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 5px solid #3498db;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Highlighted text */
+        .highlight {
+            color: #3b82f6;
+            font-weight: bold;
+        }
+
+        .pass-highlight {
+            color: #10ffaa;
+            font-weight: bold;
+        }
+
+        .fail-highlight {
+            color: #ff8080;
+            font-weight: bold;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 15px;
+            }
+            
+            .result-content {
+                font-size: 16px;
+            }
+            
+            .header-container {
+                font-size: 1rem;
+                padding: 12px;
+            }
+            
+            .back-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header-container">
+        Grading Results - OCR and NLP-Driven E-Assessment: Automated Grading of Handwritten Exam Papers
+        <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> Go Back</a>
+    </header>
+
+    <video autoplay loop muted>
+        <source src="{{ url_for('static', filename='video1.mp4') }}" type="video/mp4">
+    </video>
+
+    <!-- Results Container -->
+    <div class="content-wrapper">
+        <div class="container">
+            <div class="result-header">
+                <h2 class="text-2xl font-bold">Detailed Assessment Results</h2>
+                <a href="/scorecard" class="btn">
+                    <i class="fas fa-table mr-2"></i> View Scorecard
+                </a>
+            </div>
+            <div id="resultContent" class="result-content">
+                <div class="flex justify-center items-center h-full">
+                    <div class="flex flex-col items-center">
+                        <i class="fas fa-spinner fa-spin text-4xl mb-4"></i>
+                        <p>Loading detailed assessment results...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 E-Assessment. All Rights Reserved. | OCR and NLP-Driven Assessment System</p>
+    </footer>
+
+    <!-- JavaScript to Fetch & Display Grading Results with Animations -->
+    <script>
+        // Show loading overlay
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+        
+        // Hide loading overlay
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+        
+        // Format and highlight text
+        function formatResultText(text) {
+            // Highlight important information
+            text = text.replace(/Question \d+:/g, match => `<span class="highlight">${match}</span>`);
+            text = text.replace(/Student Answer:/g, match => `<span class="highlight">${match}</span>`);
+            text = text.replace(/Marks Obtained: \d+(\.\d+)?/g, match => `<span class="highlight">${match}</span>`);
+            text = text.replace(/PASS/g, '<span class="pass-highlight"><i class="fas fa-check-circle"></i> PASS</span>');
+            text = text.replace(/FAIL/g, '<span class="fail-highlight"><i class="fas fa-times-circle"></i> FAIL</span>');
+            
+            // Add line breaks for better readability
+            text = text.replace(/\n/g, '<br>');
+            
+            return text;
+        }
+        
+        async function fetchResults() {
+            showLoading();
+            
+            try {
+                let response = await fetch("/get_results");
+                let text = await response.text();
+                
+                if (text.trim() === "Processing") {
+                    // If still processing, hide loading overlay and show processing message with animation
+                    hideLoading();
+                    
+                    let resultContent = document.getElementById("resultContent");
+                    resultContent.innerHTML = `
+                        <div class="flex justify-center items-center h-full">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-cogs text-4xl mb-4 animate-spin"></i>
+                                <p>Your assessment is still being processed...</p>
+                                <p class="text-sm mt-2">This may take a moment. The page will automatically update.</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Check again after a delay
+                    setTimeout(fetchResults, 3000);
+                } else {
+                    // Format the result text with highlights
+                    let formattedText = formatResultText(text);
+                    let resultContent = document.getElementById("resultContent");
+                    
+                    // Hide loading overlay
+                    hideLoading();
+                    
+                    // Apply animation
+                    resultContent.innerHTML = formattedText;
+                    setTimeout(() => {
+                        resultContent.style.opacity = '1';
+                        resultContent.style.transform = 'translateY(0)';
+                    }, 100);
+                }
+            } catch (error) {
+                hideLoading();
+                console.error("Error:", error);
+                document.getElementById("resultContent").innerHTML = "Error loading results. Please try again later.";
+                document.getElementById("resultContent").style.opacity = '1';
+                document.getElementById("resultContent").style.transform = 'translateY(0)';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchResults();
+        });
+    </script>
+</body>
+</html>

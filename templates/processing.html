@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Assessment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: black;
+            color: white;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .header-container {
+            position: relative;
+            background: #1f2937;
+            color: white;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .back-btn {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #3182ce;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-btn:hover {
+            background: #2c5282;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        #steps-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        .processing-card {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(20, 24, 32, 0.7);
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .processing-card:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .step {
+            font-size: 1.3rem;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-out;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: left;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .step.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 4px solid #3b82f6;
+        }
+
+        .step.completed {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+            opacity: 0.7;
+        }
+
+        .tick {
+            color: #10b981;
+            font-size: 1.5rem;
+            margin-right: 15px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: rgba(16, 185, 129, 0.2);
+            border-radius: 50%;
+            animation: pulse-success 2s infinite;
+        }
+
+        .progress-indicator {
+            position: relative;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        @keyframes pulse-success {
+            0% { background-color: rgba(16, 185, 129, 0.1); }
+            50% { background-color: rgba(16, 185, 129, 0.3); }
+            100% { background-color: rgba(16, 185, 129, 0.1); }
+        }
+
+        footer {
+            background: #1f2937;
+            color: white;
+            padding: 12px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .processing-card {
+                width: 95%;
+                padding: 15px;
+            }
+            
+            .step {
+                font-size: 1rem;
+                padding: 10px;
+            }
+            
+            .tick {
+                width: 30px;
+                height: 30px;
+                font-size: 1.2rem;
+                margin-right: 10px;
+            }
+            
+            .header-container {
+                font-size: 1rem;
+                padding: 12px;
+            }
+            
+            .back-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header-container">
+        OCR and NLP-Driven E-Assessment: Automated Grading of Handwritten Exam Papers
+        <button id="backBtn" class="back-btn"><i class="fas fa-arrow-left"></i> Go Back</button>
+    </header>
+
+    <video autoplay loop muted>
+        <source src="{{ url_for('static', filename='video1.mp4') }}" type="video/mp4">
+    </video>
+
+    <div id="steps-container">
+        <div class="processing-card">
+            <h2 class="text-xl font-bold mb-4">Processing Handwritten Exam Papers</h2>
+            
+            <div class="progress-indicator">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+            
+            <div id="step-items">
+                <div class="step" id="step1">
+                    <span class="tick"><i class="fas fa-file-upload"></i></span> 
+                    <span>Uploading the files</span>
+                </div>
+                <div class="step" id="step2">
+                    <span class="tick"><i class="fas fa-search"></i></span> 
+                    <span>Analyzing the documents</span>
+                </div>
+                <div class="step" id="step3">
+                    <span class="tick"><i class="fas fa-font"></i></span> 
+                    <span>Extracting the handwritten text</span>
+                </div>
+                <div class="step" id="step4">
+                    <span class="tick"><i class="fas fa-tasks"></i></span> 
+                    <span>Matching the questions</span>
+                </div>
+                <div class="step" id="step5">
+                    <span class="tick"><i class="fas fa-graduation-cap"></i></span> 
+                    <span>Grading in progress</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 E-Assessment. All Rights Reserved. | OCR and NLP-Driven Assessment System</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const steps = document.querySelectorAll(".step");
+            const progressBar = document.getElementById("progressBar");
+            let index = 0;
+            let totalSteps = steps.length;
+
+            // Setup back button to cancel processing
+            document.getElementById('backBtn').addEventListener('click', async function(event) {
+                event.preventDefault();
+                
+                if (confirm('Are you sure you want to cancel processing and go back?')) {
+                    try {
+                        // Call the cancel_processing endpoint
+                        const response = await fetch('/cancel_processing', {
+                            method: 'POST'
+                        });
+                        
+                        // Redirect back to index page
+                        window.location.href = '/';
+                    } catch (error) {
+                        console.error('Error cancelling processing:', error);
+                        // Redirect anyway
+                        window.location.href = '/';
+                    }
+                }
+            });
+
+            function showNextStep() {
+                if (index < steps.length) {
+                    // Update progress bar
+                    const progressPercentage = ((index + 1) / totalSteps) * 100;
+                    progressBar.style.width = `${progressPercentage}%`;
+                    
+                    // Show current step with animation
+                    steps[index].style.opacity = "1";
+                    steps[index].style.transform = "translateY(0)";
+                    steps[index].classList.add("active");
+                    
+                    // Mark previous step as completed
+                    if (index > 0) {
+                        steps[index - 1].classList.remove("active");
+                        steps[index - 1].classList.add("completed");
+                    }
+                    
+                    index++;
+                    if (index < steps.length) {
+                        setTimeout(showNextStep, 2000);
+                    }
+                }
+            }
+            
+            // Start showing steps with a small initial delay
+            setTimeout(showNextStep, 500);
+
+            // Check grading results periodically
+            async function checkProcessingStatus() {
+                try {
+                    let response = await fetch("/get_results");
+                    let text = await response.text();
+
+                    if (text.trim() !== "Processing") {
+                        // Add completion animation before redirecting
+                        steps.forEach(step => {
+                            step.classList.remove("active");
+                            step.classList.add("completed");
+                        });
+                        progressBar.style.width = "100%";
+                        
+                        // Redirect after a short delay for visual feedback
+                        setTimeout(() => {
+                            window.location.href = "/result"; // Redirect to result page once done
+                        }, 1000);
+                    } else {
+                        setTimeout(checkProcessingStatus, 3000); // Check again in 3 seconds
+                    }
+                } catch (error) {
+                    console.error("Processing failed:", error);
+                    alert("An error occurred while processing. Please try again.");
+                }
+            }
+
+            // Start checking if processing is complete
+            checkProcessingStatus();
+        });
+    </script>
+</body>
+</html>

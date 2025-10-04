@@ -1,0 +1,9 @@
+flask
+opencv-python
+pillow
+numpy
+requests
+shutil
+pdf2image
+re
+webbrowser
